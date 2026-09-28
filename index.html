@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Extracted with ZipIt - Clean Mode -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seed - API Console</title>
+  <meta name="description" content="Developer console for managing API keys, scopes, quotas, and routes." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ── Login ── -->
+  <div id="login-screen" class="login-screen hidden">
+    <div class="login-card">
+      <div class="login-logo">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="0"/>
+          <path d="M8 21h8M12 17v4"/>
+        </svg>
+      </div>
+      <h1 class="login-title">Seed - API Console</h1>
+      <p class="login-sub">Sign in with your YouTube channel to continue.</p>
+      <a id="login-btn" href="#" class="btn btn-primary login-btn-full">Sign in with Google</a>
+      <div class="login-footer">
+        <a href="https://console.seed.soy/tos">Terms of Service</a>
+        <span class="bullet">&bull;</span>
+        <a href="https://console.seed.soy/privacy">Privacy Policy</a>
+        <span class="bullet">&bull;</span>
+        <a href="https://seedte.ch/API" target="_blank" rel="noopener">Support</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── App ── -->
+  <div id="app" class="app hidden">
+
+    <!-- Top bar -->
+    <div class="top-bar">
+      <div class="top-bar-brand">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="0"/>
+          <path d="M8 21h8M12 17v4"/>
+        </svg>
+        Seed - API Console
+      </div>
+      <span class="top-bar-sep">|</span>
+      <span style="font-size:12px;color:#aaa">Developer Dashboard</span>
+      <div class="top-bar-user">
+        Signed in as <strong id="top-bar-channel" style="color:#ddd"></strong>
+        &nbsp;·&nbsp;
+        <a href="#" id="logout-btn" style="color:#7eb8f7">Sign out</a>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="app-body">
+
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <nav>
+          <div class="nav-section-label" style="border-top:none;margin-top:0">My Account</div>
+          <a href="#" class="nav-item active" data-page="keys" id="nav-keys">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+            API Keys
+          </a>
+          <a href="#" class="nav-item" data-page="stats" id="nav-stats">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Usage
+          </a>
+
+          <div class="nav-section-label admin-only hidden">Administration</div>
+          <a href="#" class="nav-item admin-only hidden" data-page="admin-requests" id="nav-admin-requests">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+            Requests
+            <span class="badge" id="badge-requests" style="display:none"></span>
+          </a>
+          <a href="#" class="nav-item admin-only hidden" data-page="admin-keys" id="nav-admin-keys">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            All Keys
+          </a>
+          <a href="#" class="nav-item admin-only hidden" data-page="admin-routes" id="nav-admin-routes">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Routes
+          </a>
+          <a href="#" class="nav-item admin-only hidden" data-page="admin-scopes" id="nav-admin-scopes">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+            Scopes
+          </a>
+        </nav>
+
+        <div style="flex:1"></div>
+        <div class="sidebar-footer">
+          <div class="user-chip">
+            <span class="user-avatar" id="user-avatar">?</span>
+            <span class="user-id" id="user-channel-id">…</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <main class="main">
+
+        <!-- Keys -->
+        <section id="page-keys" class="page">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">API Keys</h1>
+              <p class="page-sub">Manage your personal API keys and their scope access.</p>
+            </div>
+            <button class="btn btn-primary" id="create-key-btn">+ New Key</button>
+          </div>
+          <div id="keys-list">
+            <div class="skeleton-list"><div class="skeleton"></div><div class="skeleton"></div></div>
+          </div>
+        </section>
+
+        <!-- Key detail -->
+        <section id="page-key-detail" class="page hidden">
+          <div class="back-row">
+            <a href="#" class="btn btn-ghost btn-sm" id="back-to-keys">&laquo; Back to Keys</a>
+          </div>
+          <div class="page-header">
+            <div>
+              <h1 class="page-title" id="detail-key-name">—</h1>
+              <div class="key-value-row">
+                <code class="key-value" id="detail-key-value">—</code>
+                <button class="btn btn-xs" id="copy-key-btn">Copy</button>
+              </div>
+            </div>
+            <div class="key-detail-actions">
+              <button class="btn btn-sm" id="view-history-btn">View History</button>
+              <button class="btn btn-sm" id="rename-key-btn">Rename</button>
+              <button class="btn btn-sm" id="toggle-key-btn">—</button>
+            </div>
+          </div>
+          <div class="detail-grid">
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Scopes</span>
+                <button class="btn btn-xs" id="request-scope-btn">Request Access</button>
+              </div>
+              <div id="detail-scopes-list" class="scopes-list"></div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Usage (24 h)</span>
+                <select class="select" id="detail-scope-select" style="width:200px;font-size:12px;padding:2px 8px;height:auto"><option value="">All Scopes</option></select>
+              </div>
+              <div id="detail-usage-chart" class="usage-chart-wrap"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Usage -->
+        <section id="page-stats" class="page hidden">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Usage</h1>
+              <p class="page-sub">API call volume over time, per key.</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <select class="select" id="stats-key-select" style="width:200px"><option value="">-- Choose a key --</option></select>
+              &nbsp;
+              <select class="select" id="stats-scope-select" style="width:200px"><option value="">All Scopes</option></select>
+              &nbsp;
+              <select class="select" id="stats-hours-select" style="width:120px">
+                <option value="6">Last 6h</option>
+                <option value="24" selected>Last 24h</option>
+                <option value="72">Last 3d</option>
+                <option value="168">Last 7d</option>
+              </select>
+            </div>
+            <div id="stats-chart" class="usage-chart-wrap large"></div>
+          </div>
+        </section>
+
+        <!-- Admin: Requests -->
+        <section id="page-admin-requests" class="page hidden">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Pending Requests</h1>
+              <p class="page-sub">Review and approve or deny scope access requests.</p>
+            </div>
+          </div>
+          <div id="requests-list">
+            <div class="skeleton-list"><div class="skeleton"></div><div class="skeleton"></div></div>
+          </div>
+        </section>
+
+        <!-- Admin: All keys -->
+        <section id="page-admin-keys" class="page hidden">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">All Keys</h1>
+              <p class="page-sub">View and manage API keys across all channels.</p>
+            </div>
+            <div class="row gap-8">
+              <input class="input" id="admin-keys-filter" placeholder="Filter by channel ID…" style="width:200px" />
+              <button class="btn btn-primary" id="admin-create-key-btn">+ New Key</button>
+            </div>
+          </div>
+          <div id="admin-keys-list">
+            <div class="skeleton-list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+          </div>
+        </section>
+
+        <!-- Admin: Routes -->
+        <section id="page-admin-routes" class="page hidden">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Routes</h1>
+              <p class="page-sub">Configure API gateway routing rules.</p>
+            </div>
+            <button class="btn btn-primary" id="add-route-btn">+ Add Route</button>
+          </div>
+          <div id="routes-list">
+            <div class="skeleton-list"><div class="skeleton"></div><div class="skeleton"></div></div>
+          </div>
+        </section>
+
+        <!-- Admin: Scopes -->
+        <section id="page-admin-scopes" class="page hidden">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Scopes</h1>
+              <p class="page-sub">Control which API scopes users can request access to.</p>
+            </div>
+          </div>
+          <div id="scopes-config-list">
+            <div class="skeleton-list"><div class="skeleton"></div><div class="skeleton"></div></div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ── Modals ── -->
+
+  <div id="modal-create-key" class="modal-backdrop hidden">
+    <div class="modal">
+      <div class="modal-header"><span class="modal-title">New API Key</span><button class="modal-close" data-close="modal-create-key">&#10005;</button></div>
+      <div style="padding:12px 12px 0">
+        <label class="field-label">Key name</label>
+        <input class="input" id="new-key-name" placeholder="e.g. Production" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-close="modal-create-key">Cancel</button>
+        <button class="btn btn-primary" id="confirm-create-key">Create Key</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-admin-create-key" class="modal-backdrop hidden">
+    <div class="modal">
+      <div class="modal-header"><span class="modal-title">New Key (Admin)</span><button class="modal-close" data-close="modal-admin-create-key">&#10005;</button></div>
+      <div style="padding:12px 12px 0">
+        <label class="field-label">Key name</label>
+        <input class="input" id="admin-new-key-name" placeholder="e.g. Partner Key" />
+        <label class="field-label" style="margin-top:10px">Owner channel ID</label>
+        <input class="input" id="admin-new-key-channel" placeholder="UCxxxxxxxxxxxxxxxx" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-close="modal-admin-create-key">Cancel</button>
+        <button class="btn btn-primary" id="confirm-admin-create-key">Create Key</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-rename-key" class="modal-backdrop hidden">
+    <div class="modal">
+      <div class="modal-header"><span class="modal-title">Rename Key</span><button class="modal-close" data-close="modal-rename-key">&#10005;</button></div>
+      <div style="padding:12px 12px 0">
+        <label class="field-label">New name</label>
+        <input class="input" id="rename-key-input" placeholder="Key name" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-close="modal-rename-key">Cancel</button>
+        <button class="btn btn-primary" id="confirm-rename-key">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-request-scope" class="modal-backdrop hidden">
+    <div class="modal">
+      <div class="modal-header"><span class="modal-title">Request Scope Access</span><button class="modal-close" data-close="modal-request-scope">&#10005;</button></div>
+      <div style="padding:12px 12px 0">
+        <label class="field-label">Scope</label>
+        <select class="select full" id="req-scope-select"><option value="">Select…</option></select>
+        <label class="field-label" style="margin-top:10px">Requested quota</label>
+        <input class="input" id="req-quota" type="number" min="1" placeholder="e.g. 1000" />
+        <label class="field-label" style="margin-top:10px">Reset period</label>
+        <select class="select full" id="req-quota-time"><option value="">Select…</option></select>
+        <label class="field-label" style="margin-top:10px">Reason for access</label>
+        <textarea class="input textarea" id="req-reason" placeholder="Describe your use case…"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-close="modal-request-scope">Cancel</button>
+        <button class="btn btn-primary" id="confirm-request-scope">Submit Request</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-route" class="modal-backdrop hidden">
+    <div class="modal modal-wide">
+      <div class="modal-header"><span class="modal-title" id="route-modal-title">Add Route</span><button class="modal-close" data-close="modal-route">&#10005;</button></div>
+      <div style="padding:12px 12px 0">
+        <input type="hidden" id="route-id-field" value="" />
+        <label class="field-label">Path</label>
+        <input class="input" id="route-path" placeholder="/api/v1/example" />
+        <label class="field-label" style="margin-top:10px">Destination</label>
+        <input class="input" id="route-dest" placeholder="http://scope:8080/path" />
+        <label class="field-label" style="margin-top:10px">Description</label>
+        <input class="input" id="route-desc" placeholder="Optional description" />
+        <div style="margin-top:10px;display:flex;gap:20px;align-items:flex-end">
+          <div style="flex:1">
+            <label class="field-label">Route Type</label>
+            <select class="select full" id="route-type-select">
+              <option value="API">API</option>
+              <option value="API_INTERNAL">API_INTERNAL</option>
+            </select>
+          </div>
+          <div style="padding-bottom:10px">
+            <label class="checkbox-label"><input type="checkbox" id="route-requires-key" /> Requires API key</label>
+          </div>
+        </div>
+        <div id="route-scope-row" style="margin-top:10px">
+          <label class="field-label">Required scope</label>
+          <select class="select full" id="route-scope-select"><option value="">Select…</option></select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-close="modal-route">Cancel</button>
+        <button class="btn btn-primary" id="confirm-save-route">Save Route</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-approve" class="modal-backdrop hidden">
+    <div class="modal">
+      <div class="modal-header"><span class="modal-title">Approve Request</span><button class="modal-close" data-close="modal-approve">&#10005;</button></div>
+      <div style="padding:12px 12px 0">
+        <input type="hidden" id="approve-key-id" />
+        <input type="hidden" id="approve-scope" />
+        <label class="field-label">Quota limit</label>
+        <input class="input" id="approve-quota" type="number" min="1" />
+        <label class="field-label" style="margin-top:10px">Reset period</label>
+        <select class="select full" id="approve-quota-time"></select>
+        <label class="field-label" style="margin-top:10px">Admin note (optional)</label>
+        <input class="input" id="approve-reason" placeholder="Reason" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-close="modal-approve">Cancel</button>
+        <button class="btn btn-primary" id="confirm-approve">Approve</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-admin-add-scope" class="modal-backdrop hidden">
+    <div class="modal">
+      <div class="modal-header"><span class="modal-title">Add Scope to Key</span><button class="modal-close" data-close="modal-admin-add-scope">&#10005;</button></div>
+      <div style="padding:12px 12px 0">
+        <input type="hidden" id="admin-add-scope-key-id" />
+        <label class="field-label">Scope</label>
+        <select class="select full" id="admin-add-scope-select"><option value="">Select…</option></select>
+        <label class="field-label" style="margin-top:10px">Quota limit</label>
+        <input class="input" id="admin-add-quota" type="number" min="1" placeholder="e.g. 5000" />
+        <label class="field-label" style="margin-top:10px">Reset period</label>
+        <select class="select full" id="admin-add-quota-time"><option value="">Select…</option></select>
+        <label class="field-label" style="margin-top:10px">Admin note (optional)</label>
+        <input class="input" id="admin-add-reason" placeholder="Reason" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-close="modal-admin-add-scope">Cancel</button>
+        <button class="btn btn-primary" id="confirm-admin-add-scope">Add Scope</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-deny" class="modal-backdrop hidden">
+    <div class="modal">
+      <div class="modal-header"><span class="modal-title">Deny Request</span><button class="modal-close" data-close="modal-deny">&#10005;</button></div>
+      <div style="padding:12px 12px 0">
+        <input type="hidden" id="deny-key-id" />
+        <input type="hidden" id="deny-scope" />
+        <label class="field-label">Rejection reason (optional)</label>
+        <input class="input" id="deny-reason" placeholder="Reason for rejection" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-close="modal-deny">Cancel</button>
+        <button class="btn btn-primary" style="background:var(--red);border-color:var(--red)" id="confirm-deny">Deny Request</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-key-history" class="modal-backdrop hidden">
+    <div class="modal modal-extra-wide">
+      <div class="modal-header"><span class="modal-title" id="history-modal-title">Key Scope History</span><button class="modal-close" data-close="modal-key-history">&#10005;</button></div>
+      <div style="padding:16px" id="history-modal-body">
+        <div class="skeleton-list"><div class="skeleton"></div><div class="skeleton"></div></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-close="modal-key-history">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
